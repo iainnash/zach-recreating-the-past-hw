@@ -26,7 +26,8 @@ public:
     
     ofTrueTypeFont font;
     
+    ofFbo fbo;
     ofVideoGrabber vidGrabber;
-    ofTexture vidTexture;
+    ofPixels pixelsGrabber;
     ofImage frameImage;
 };

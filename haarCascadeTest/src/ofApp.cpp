@@ -17,19 +17,18 @@ void ofApp::setup(){
     vidGrabber.setDesiredFrameRate(15);
     vidGrabber.initGrabber(camWidth, camHeight);
     
-    vidTexture.allocate(camWidth, camHeight, OF_PIXELS_RGB);
+    fbo.allocate(camWidth, camHeight, OF_PIXELS_RGB);
 
     ofSetVerticalSync(true);
     
-    font.load("outwrite.ttf", 20);
+    font.load("silom.ttf", 10);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     vidGrabber.update();
     if (vidGrabber.isFrameNew()) {
-        ofPixels & pixelsGrabber = vidGrabber.getPixels();
-        vidTexture.loadData(pixelsGrabber);
+        pixelsGrabber = vidGrabber.getPixels();
         finder.blobs.clear();
         finder.findHaarObjects(pixelsGrabber);
     }
@@ -38,20 +37,34 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofBackground(100);
-    ofSetColor(200, 40);
-    vidTexture.draw(0, 0);
-    ofSetColor(255);
     ofNoFill();
     
-    for (unsigned int i = 0; i < min((unsigned long)3, finder.blobs.size()); i++) {
+    for (unsigned int i = 0; i < min((unsigned long)2, finder.blobs.size()); i++) {
         ofRectangle sz = font.getStringBoundingBox("person", 0, 0);
         ofRectangle cur = finder.blobs[i].boundingRect;
+        
+        ofTexture pixTex;
+        pixTex.allocate(cur.width, cur.height, OF_PIXELS_RGBA);
+        ofPixels cropped;
+        pixelsGrabber.cropTo(cropped, cur.x, cur.y, cur.width, cur.height);
+        pixTex.loadData(cropped);
+        ofSetColor(255, 40);
+        for (int xi = 0; xi < ofGetWidth(); xi += cur.width) {
+            for (int yi = 0; yi < ofGetHeight(); yi += cur.height) {
+                pixTex.draw(xi, yi);
+            }
+        }
+        ofSetColor(255, 255);
+        pixTex.draw(cur.x, cur.y);
+        
+        ofSetColor(0, 255);
+        ofDrawRectangle(cur.x, cur.y, cur.width, cur.height);
         for (int xi = cur.x; xi < cur.x + cur.width; xi += sz.getWidth()) {
             for (int yi = cur.y; yi < cur.y + cur.height; yi += sz.getHeight()) {
+                ofSetColor(255, 50);
                 font.drawString("person", xi, yi);
             }
         }
-        ofDrawRectangle(cur.x, cur.y, cur.width, cur.height);
     }
 }
 

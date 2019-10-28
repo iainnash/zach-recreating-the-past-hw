@@ -31,12 +31,9 @@ void ofApp::update(){
 void ofApp::draw(){
     ofBackground(255);
     ofSeedRandom(10);
-    int noiseCount = 0;
-
+    
     string textToDraw;
     textToDraw += currentChar;
-                                                           //   vflip, filled
-    vector < ofPath > paths = font.getStringAsPoints(textToDraw, true, true);
     
     ofRectangle boxLarge = font.getStringBoundingBox(textToDraw, 0, 0);
     ofRectangle boxSmall = fontSmall.getStringBoundingBox(fontName, 0, 0);
@@ -44,27 +41,31 @@ void ofApp::draw(){
     fbo.begin();
     ofTranslate((ofGetWidth()/2)-boxLarge.width/2, (ofGetHeight()/2)+boxLarge.height/2);
     ofClear(0);
-    ofSetColor(245);
+    ofSetColor(255);
     font.drawString(textToDraw, 0, 0);
     fbo.end();
     ofPixels savedPixels;
     fbo.readToPixels(savedPixels);
     
-    //fbo.draw(0, 0);
+    ofSetColor(235, 255);
+    fbo.draw(-10, -10);
+    ofSetColor(0, 100);
     
-    ofSetColor(0, 0, 0, 140);
-    for (int xi = 0; xi < fbo.getWidth(); xi+=boxSmall.width / 2.3) {
-        for (int yi = 0; yi < fbo.getHeight(); yi+=boxSmall.height - 3) {
+    for (int yi = 0; yi < fbo.getHeight(); yi += boxSmall.height) {
+        bool hasDrawn = false;
+        for (int xi = 0; xi < fbo.getWidth(); xi += hasDrawn ? boxSmall.width : boxSmall.height) {
             if (savedPixels.getColor(xi, yi).r) {
+                hasDrawn = true;
                 fontSmall.drawString(
                     fontName,
-                    xi - boxSmall.width / 2,
-                    yi - boxSmall.height / 2
+                    xi - boxSmall.width / 2 + ofRandom(-2, 2),
+                    yi - boxSmall.height / 2 + ofRandom(-2, 2)
                 );
+            } else {
+                hasDrawn = false;
             }
         }
     }
-    
 }
 
 //--------------------------------------------------------------

@@ -21,9 +21,15 @@ void ofApp::draw(){
             unsigned char r = data[(y*grabberW+x)*3+0];
             unsigned char g = data[(y*grabberW+x)*3+1];
             unsigned char b = data[(y*grabberW+x)*3+2];
-            int colorOffset = ofMap(ofNoise(tm + x*0.04 + y * 0.04), 0, 1, 100, 255);
-            ofSetColor(b, r, max(0, colorOffset-g));
-            float radius = ofMap(ofNoise(x*0.05 + tm, y*0.05 + tm), 0, 1, 2, 20);
+            int colorOffset = ofMap(
+                ofNoise(tm + x*0.04 + y * 0.04),
+                0, 1, 0, 100
+            );
+            ofSetColor(min(colorOffset+r, 255), b, max(0, g-20));
+            float radius = ofMap(
+                ofNoise(x*0.05 + tm, y*0.05 + tm),
+                0, 1, 2, 20
+            );
             ofDrawCircle(x, y, radius);
         }
     }
